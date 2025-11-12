@@ -66,18 +66,3 @@ export async function googlelogin(req, res) {
         return res.status(500).json({ success: false, message: "Unexpected Error" });
     }
 }
-
-export async function googlesignup(req, res) {
-    await mongoconnect();
-    const { email, name, picture, googleId } = req.body;
-    try {
-        const usergoogleemail = await Usergoogle.findOne({ googleemail: email });
-        if (usergoogleemail)
-            return res.status(400).json({ success: false, message: "Google Email already Existed" });
-        await Usergoogle.create({ googleemail: email, googlename: name, googleid: googleId, googlepicture: picture });
-        return res.status(200).json({ success: true, message: "Google Account Sign Up Successful" });
-    }
-    catch (err) {
-        return res.status(500).json({ success: false, message: "Unexpected Error" });
-    }
-}
