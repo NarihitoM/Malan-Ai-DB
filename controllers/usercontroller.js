@@ -49,7 +49,7 @@ export async function googlelogin(req, res) {
     await mongoconnect();
     const { email, name, picture, googleId } = req.body;
     try {
-        let user = await Usergoogle.findOne({ googleemail: email });
+        let user = await Usergoogle.findOne({ googleid : googleId });
         if (!user) {
             user = await Usergoogle.create({ googleemail: email, googlename: name, googleid: googleId, googlepicture: picture });
         }
