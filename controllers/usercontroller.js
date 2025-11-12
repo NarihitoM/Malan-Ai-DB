@@ -1,0 +1,81 @@
+import User from "../models/userschema.js";
+import Usergoogle from "../models/userschemagooglelogin.js";
+import { mongoconnect } from "../libs/mongodbconnect.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
+export async function login(req, res) {
+    await mongoconnect();
+    const { email, password } = req.body;
+    try {
+        const useremail = await User.findOne({ email : email });
+        if (!useremail) {
+            return res.status(400).json({ success: false, message: "Incorrect email and password" });
+        }
+        const passwordmatch = await bcrypt.compare(password, useremail.password);
+        if (!passwordmatch) {
+            return res.status(400).json({ success: false, message: "Incorrect email and password" });
+        }
+       
+        const token = jwt.sign({ id: useremail._id, email: useremail.email }, process.env.JWT_SECRET, { expiresIn: "1d" });
+
+        return res.status(200).json({ success: true, message: "Log in successful", email,token });
+    }
+    catch (err) {
+        return res.status(500).json({ success: false, message: "Unexpected Error" });
+    }
+}
+
+
+export async function signup(req, res) {
+    await mongoconnect();
+    const { email, password } = req.body;
+    try {
+        const useremail = await User.findOne({ email : email });
+        if (useremail) {
+            return res.status(400).json({ success: false, message: "Email Already Existed" });
+        }
+        let encryptedpassword = await bcrypt.hash(password, 10);
+        await User.create({ email: email, password: encryptedpassword });
+        return res.status(200).json({ success: true, message: "Account successfully created" });
+    }
+    catch (err) {
+        return res.status(500).json({ success: false, message: "Unexpected error" });
+    }
+}
+
+export async function googlelogin(req, res) {
+
+    await mongoconnect();
+    const { email, name, picture, googleId } = req.body;
+    try {
+        const user = await Usergoogle.findOne({ googleemail : email});
+        if (!user) {
+            return res.status(400).json({ success: false, message: "Please Sign Up Google Email" });
+        }
+        const token = jwt.sign({id: user._id , googleemail: user.googleemail},process.env.JWT_SECRET,{expiresIn: "1d"});
+        const googleusername = user.googlename;
+        return res.status(200).json({ success: true, message: "Google Acc successfully login", googleusername ,token });
+    }
+    catch (err) {
+        return res.status(500).json({ success: false, message: "Unexpected Error" });
+    }
+}
+
+export async function googlesignup(req,res) 
+{
+   await mongoconnect();
+   const {email,name,picture,googleId} = req.body;
+   try
+   {
+       const usergoogleemail = await Usergoogle.findOne({ googleemail : email});
+       if(usergoogleemail)
+       return res.status(400).json({success: false, message:"Google Email already Existed"});
+       await Usergoogle.create({googleemail: email,googlename: name,googleid : googleId ,googlepicture : picture});
+       return res.status(200).json({success: true,message:"Google Account Sign Up Successful"});
+   }
+   catch(err)
+   {
+    return res.status(500).json({success: false,message:"Unexpected Error"});
+   }
+}
