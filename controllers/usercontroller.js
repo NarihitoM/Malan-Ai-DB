@@ -43,42 +43,23 @@ export async function signup(req, res) {
         return res.status(500).json({ success: false, message: "Unexpected error" });
     }
 }
+
 export async function googlelogin(req, res) {
+
     await mongoconnect();
     const { email, name, picture, googleId } = req.body;
-
     try {
         let user = await Usergoogle.findOne({ googleemail: email });
-
         if (!user) {
-        
-            user = await Usergoogle.create({
-                googleemail: email,
-                googlename: name,
-                googleid: googleId,
-                googlepicture: picture
-            });
+            user = await Usergoogle.create({ googleemail: email, googlename: name, googleid: googleId, googlepicture: picture });
         }
-
-     
-        const token = jwt.sign(
-            { id: user._id, googleemail: user.googleemail },
-            process.env.JWT_SECRET,
-            { expiresIn: "1d" }
-        );
-
-        return res.status(200).json({
-            success: true,
-            message: "Google account successfully logged in",
-            username: user.googlename,
-            token
-        });
-    } catch (err) {
-        console.error(err);
+        const token = jwt.sign({ id: user._id, googleemail: user.googleemail }, process.env.JWT_SECRET, { expiresIn: "1d" });
+        return res.status(200).json({ success: true, message: "Google Acc successfully login", username: user.googlename, token });
+    }
+    catch (err) {
         return res.status(500).json({ success: false, message: "Unexpected Error" });
     }
 }
-
 
 export async function googlesignup(req, res) {
     await mongoconnect();
