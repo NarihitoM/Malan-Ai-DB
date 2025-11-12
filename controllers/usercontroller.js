@@ -16,7 +16,7 @@ export async function login(req, res) {
         if (!passwordmatch) {
             return res.status(400).json({ success: false, message: "Incorrect email and password" });
         }
-       
+        
         const token = jwt.sign({ id: useremail._id, email: useremail.email }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
         return res.status(200).json({ success: true, message: "Log in successful", email,token });
@@ -49,9 +49,9 @@ export async function googlelogin(req, res) {
     await mongoconnect();
     const { email, name, picture, googleId } = req.body;
     try {
-        const user = await Usergoogle.findOne({ googleemail : email});
+        let user = await Usergoogle.findOne({ googleemail : email});
         if (!user) {
-            return res.status(400).json({ success: false, message: "Please Sign Up Google Email" });
+           user = await Usergoogle.create({googleemail: email,googlename: name,googleid: googleId,googlepicture: picture});
         }
         const token = jwt.sign({id: user._id , googleemail: user.googleemail},process.env.JWT_SECRET,{expiresIn: "1d"});
         const googleusername = user.googlename;
