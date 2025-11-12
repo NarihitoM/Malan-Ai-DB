@@ -54,7 +54,7 @@ export async function googlelogin(req, res) {
            user = await Usergoogle.create({googleemail: email,googlename: name,googleid: googleId,googlepicture: picture});
         }
         const token = jwt.sign({id: user._id , googleemail: user.googleemail},process.env.JWT_SECRET,{expiresIn: "1d"});
-        const googleusername = user.googlename;
+        let googleusername = user.googlename;
         return res.status(200).json({ success: true, message: "Google Acc successfully login", googleusername ,token });
     }
     catch (err) {
