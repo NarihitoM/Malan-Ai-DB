@@ -8,7 +8,7 @@ export async function login(req, res) {
     await mongoconnect();
     const { email, password } = req.body;
     try {
-        const useremail = await User.findOne({ email : email });
+        const useremail = await User.findOne({ email: email });
         if (!useremail) {
             return res.status(400).json({ success: false, message: "Incorrect email and password" });
         }
@@ -16,10 +16,10 @@ export async function login(req, res) {
         if (!passwordmatch) {
             return res.status(400).json({ success: false, message: "Incorrect email and password" });
         }
-        
+
         const token = jwt.sign({ id: useremail._id, email: useremail.email }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
-        return res.status(200).json({ success: true, message: "Log in successful", email,token });
+        return res.status(200).json({ success: true, message: "Log in successful", email, token });
     }
     catch (err) {
         return res.status(500).json({ success: false, message: "Unexpected Error" });
@@ -31,7 +31,7 @@ export async function signup(req, res) {
     await mongoconnect();
     const { email, password } = req.body;
     try {
-        const useremail = await User.findOne({ email : email });
+        const useremail = await User.findOne({ email: email });
         if (useremail) {
             return res.status(400).json({ success: false, message: "Email Already Existed" });
         }
@@ -43,41 +43,54 @@ export async function signup(req, res) {
         return res.status(500).json({ success: false, message: "Unexpected error" });
     }
 }
-
 export async function googlelogin(req, res) {
-
     await mongoconnect();
     const { email, name, picture, googleId } = req.body;
+
     try {
-        let user = await Usergoogle.findOne({ googleemail : email});
-        if (user) {
-            return res.status(200).json({ success: false, message: "Google Email Already Existed"});
+        let user = await Usergoogle.findOne({ googleemail: email });
+
+        if (!user) {
+        
+            user = await Usergoogle.create({
+                googleemail: email,
+                googlename: name,
+                googleid: googleId,
+                googlepicture: picture
+            });
         }
 
-        user =  await Usergoogle.create({googleemail: email,googlename: name,googleid: googleId,googlepicture: picture});
-    
-        const token = jwt.sign({id: user._id , googleemail: user.googleemail},process.env.JWT_SECRET,{expiresIn: "1d"});
-        return res.status(200).json({ success: true, message: "Google Acc successfully login", username: user.googlename ,token });
-    }
-    catch (err) {
+     
+        const token = jwt.sign(
+            { id: user._id, googleemail: user.googleemail },
+            process.env.JWT_SECRET,
+            { expiresIn: "1d" }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Google account successfully logged in",
+            username: user.googlename,
+            token
+        });
+    } catch (err) {
+        console.error(err);
         return res.status(500).json({ success: false, message: "Unexpected Error" });
     }
 }
 
-export async function googlesignup(req,res) 
-{
-   await mongoconnect();
-   const {email,name,picture,googleId} = req.body;
-   try
-   {
-       const usergoogleemail = await Usergoogle.findOne({ googleemail : email});
-       if(usergoogleemail)
-       return res.status(400).json({success: false, message:"Google Email already Existed"});
-       await Usergoogle.create({googleemail: email,googlename: name,googleid : googleId ,googlepicture : picture});
-       return res.status(200).json({success: true,message:"Google Account Sign Up Successful"});
-   }
-   catch(err)
-   {
-    return res.status(500).json({success: false,message:"Unexpected Error"});
-   }
+
+export async function googlesignup(req, res) {
+    await mongoconnect();
+    const { email, name, picture, googleId } = req.body;
+    try {
+        const usergoogleemail = await Usergoogle.findOne({ googleemail: email });
+        if (usergoogleemail)
+            return res.status(400).json({ success: false, message: "Google Email already Existed" });
+        await Usergoogle.create({ googleemail: email, googlename: name, googleid: googleId, googlepicture: picture });
+        return res.status(200).json({ success: true, message: "Google Account Sign Up Successful" });
+    }
+    catch (err) {
+        return res.status(500).json({ success: false, message: "Unexpected Error" });
+    }
 }
