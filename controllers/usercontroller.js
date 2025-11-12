@@ -19,7 +19,7 @@ export async function login(req, res) {
 
         const token = jwt.sign({ id: useremail._id, email: useremail.email }, process.env.JWT_SECRET, { expiresIn: "1d" });
 
-        return res.status(200).json({ success: true, message: "Log in successful", email, token });
+        return res.status(200).json({ success: true, message: "Login Successful", email, token });
     }
     catch (err) {
         return res.status(500).json({ success: false, message: "Unexpected Error" });
@@ -37,7 +37,7 @@ export async function signup(req, res) {
         }
         let encryptedpassword = await bcrypt.hash(password, 10);
         await User.create({ email: email, password: encryptedpassword });
-        return res.status(200).json({ success: true, message: "Account successfully created" });
+        return res.status(200).json({ success: true, message: "Account Successfully Created" });
     }
     catch (err) {
         return res.status(500).json({ success: false, message: "Unexpected error" });
@@ -55,7 +55,7 @@ export async function googlelogin(req, res) {
         }
         const token = jwt.sign({ id: user._id, googleemail: user.googleemail }, process.env.JWT_SECRET, { expiresIn: "1d" });
         return res.status(200).json({
-            success: true, message: "Google Acc successfully login", 
+            success: true, message: "Google Login Successful", 
             username: user.googlename,
             email: user.googleemail,
             picture: user.googlepicture,
