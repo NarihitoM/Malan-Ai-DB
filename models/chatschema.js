@@ -2,7 +2,15 @@ import mongoose from "mongoose";
 
 const chatmessage = new mongoose.Schema({
     id: { type: String, requied: true },
-    message: { type: String, required: true }
+    messages: [
+    {
+      sender: { type: String, required: true },
+      text: { type: String, default: "" },
+      files: [{ name: String, url: String }],
+      fileDownload: { name: String, url: String },
+      createdAt: { type: Date, default: Date.now },
+    }
+  ]
 },
     {
         timestamps: true,
