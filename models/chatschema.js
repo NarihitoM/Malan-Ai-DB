@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const chatmessage = new mongoose.Schema({
      id : {type: String, requied: true },
-     message : {type: string , required : true}
+     message : {type: String , required : true}
 },
 {
     timestamps : true,
