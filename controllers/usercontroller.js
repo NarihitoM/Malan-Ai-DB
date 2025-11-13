@@ -89,7 +89,7 @@ export async function getchathistory(req, res) {
     try {
         const chatdata = await Chat.findOne({ id });
         if (!chatdata)
-            return res.status(400).json({ messages: [] });
+            return res.status(200).json({ messages: [] });
         res.status(200).json({ messages: chatdata.messages });
     } catch (err) {
         console.error(err);

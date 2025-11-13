@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const chatmessage = new mongoose.Schema({
-    id: { type: String, requied: true },
+    id: { type: String, required: true },
     messages: [
     {
       sender: { type: String, required: true },
