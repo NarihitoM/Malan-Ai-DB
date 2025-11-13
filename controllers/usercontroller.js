@@ -1,5 +1,6 @@
 import User from "../models/userschema.js";
 import Usergoogle from "../models/userschemagooglelogin.js";
+import Chat from "../models/chatschema.js";
 import { mongoconnect } from "../libs/mongodbconnect.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -64,5 +65,24 @@ export async function googlelogin(req, res) {
     }
     catch (err) {
         return res.status(500).json({ success: false, message: "Unexpected Error" });
+    }
+}
+
+export async function chat(req,res)
+{
+    await mongoconnect();
+    const { id, userchatmessage } = req.body;
+    try
+    {
+        const useridexist = Chat.findOne({id : id});
+        if(!useridexist)
+        {
+            Chat.create({id: id, message : userchatmessage});
+        }
+        return res.status(200).json({success : true,message: "Done"});
+    }
+    catch(err)
+    {
+        return res.status(500).json({success: false, message : "Uexpected Error"});
     }
 }
