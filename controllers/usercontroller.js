@@ -87,7 +87,7 @@ export async function getchathistory(req, res) {
     await mongoconnect();
     const { id } = req.params;
     try {
-        const chatdata = Chat.findOne({ id });
+        const chatdata = await Chat.findOne({ id });
         if (!chatdata)
             return res.status(400).json({ messages: [] });
         res.status(200).json({ messages: chatdata.messages });
