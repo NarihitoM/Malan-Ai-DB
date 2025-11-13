@@ -74,10 +74,10 @@ export async function chat(req,res)
     const { id, userchatmessage } = req.body;
     try
     {
-        const useridexist = Chat.findOne({id : id});
+        const useridexist = await Chat.findOne({id : id});
         if(!useridexist)
         {
-            Chat.create({id: id, message : userchatmessage});
+           await Chat.create({id: id, message : userchatmessage});
         }
         return res.status(200).json({success : true,message: "Done"});
     }
